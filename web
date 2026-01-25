@@ -1,12 +1,46 @@
 <html>
 <head>
-<title>Loading...</title>
-<HTA:APPLICATION ID="oHTA" APPLICATIONNAME="Update" />
+<title>Debug</title>
+<HTA:APPLICATION
+    ID="dbg"
+    APPLICATIONNAME="HTA Debug"
+    BORDER="thin"
+    SHOWINTASKBAR="no"
+/>
 </head>
+
 <script language="JScript">
-window.resizeTo(0,0);
-var shell = new ActiveXObject("WScript.Shell");
-shell.Run('cmd.exe /c powershell.exe -NoProfile -Command "curl.exe -s -L -o ..."', 0, false);
-window.close();
+(function () {
+    var logPath = "C:\\temp\\hta_debug.log";
+
+    function log(msg) {
+        try {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var f;
+            if (fso.FileExists(logPath)) {
+                f = fso.OpenTextFile(logPath, 8);
+            } else {
+                f = fso.CreateTextFile(logPath, true);
+            }
+            f.WriteLine(new Date().toISOString() + " | " + msg);
+            f.Close();
+        } catch (e) {
+            // Last-ditch UI signal if file write is blocked
+            alert("Logging failed: " + e.message);
+        }
+    }
+
+    log("HTA script started");
+
+    try {
+        var sh = new ActiveXObject("WScript.Shell");
+        log("ActiveXObject(WScript.Shell) succeeded");
+    } catch (e) {
+        log("ActiveXObject(WScript.Shell) FAILED: " + e.message);
+    }
+
+    log("HTA script finished");
+    window.close();
+})();
 </script>
 </html>
